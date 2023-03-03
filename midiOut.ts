@@ -6,13 +6,13 @@ const NOTE_OFF = 0x80
 /**
  * Custom blocks
  */
-//% weight=100 color=#0fbc11 icon="X"
+//% weight=100 color=#0fbc11 icon=""
 namespace midiInOut {
     /**
      * send a midi note
      * @param note note number
      */
-    //% block
+    //% block="send noteOn $note with velocity $velocity on channel $channel"
     export function sendNoteOn(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
         midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_ON | channel);
@@ -25,7 +25,7 @@ namespace midiInOut {
      * send a midi noteOff
      * @param note note number
      */
-    //% block
+    //% block="send noteOff $note with velocity $velocity on channel $channel"
     export function noteOff(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
         midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel);
@@ -38,7 +38,7 @@ namespace midiInOut {
      * set midi pins
      * @param note note number
      */
-    //% block "MIDI out = $midiOut MIDI in = $midiIn"
+    //% block="MIDI out pin = $midiOut MIDI in pin = $midiIn"
     export function setMidiPins(midiOut: SerialPin, midiIn: SerialPin) {
         serial.redirect(
             SerialPin.P0,
