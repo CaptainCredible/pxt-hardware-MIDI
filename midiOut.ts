@@ -41,8 +41,8 @@ namespace midiInOut {
     //% block="MIDI out pin = $midiOut MIDI in pin = $midiIn"
     export function setMidiPins(midiOut: SerialPin, midiIn: SerialPin) {
         serial.redirect(
-            SerialPin.P0,
-            SerialPin.P8,
+            midiOut,
+            midiIn,
             BaudRate.BaudRate31250
         )
     }
