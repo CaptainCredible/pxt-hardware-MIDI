@@ -7,7 +7,7 @@ const NOTE_OFF = 0x80
  */
 //% weight=100 color=#0fbc11 icon=""
 namespace midiInOut {
-    let MIDIOUTPIN = SerialPin.P0
+    let MIDIOUTPIN = SerialPin.P1
     let MIDIINPIN = SerialPin.P0
     
     //% block="send $snot"
@@ -71,7 +71,19 @@ namespace midiInOut {
             BaudRate.BaudRate31250
         )
     }
+
+    //%block="fake received| $noteSelect"
+    export function fakeReceivedNote(noteSelect: number): void {
+        control.raiseEvent(1337, noteSelect+100)
+    }
+
+    //%block="on received| $noteSelect"
+    export function onReceivedNote(noteSelect: number, thing: () => void) {
+        control.onEvent(1337, noteSelect+100, thing);
+    }
 }
+
+
 
 
 
