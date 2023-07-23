@@ -2,20 +2,30 @@
 
 const NOTE_ON = 0x90
 const NOTE_OFF = 0x80
-
 /**
  * Custom blocks
  */
 //% weight=100 color=#0fbc11 icon=""
 namespace midiInOut {
+    let MIDIOUTPIN = SerialPin.P0
+    let MIDIINPIN = SerialPin.P0
+    
+    //% block="send $snot"
+    //% snot.min=-100 snot.max=100
+    export function foo(snot: number) {
+
+    }
+    
     /**
      * send a midi note
      * @param note note number
      */
     //% block="send noteOn $note with velocity $velocity on channel $channel"
+    //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
+    //% channel.defl=1 velocity.defl=127 note.defl=60
     export function sendNoteOn(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
-        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_ON | channel);
+        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_ON | channel-1);
         midiMessage.setNumber(NumberFormat.UInt8LE, 1, note);
         midiMessage.setNumber(NumberFormat.UInt8LE, 2, velocity);
         serial.writeBuffer(midiMessage);
@@ -26,6 +36,8 @@ namespace midiInOut {
      * @param note note number
      */
     //% block="send noteOff $note with velocity $velocity on channel $channel"
+    //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
+    //% channel.defl=1 velocity.defl=127 note.defl=60
     export function noteOff(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
         midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel);
@@ -35,18 +47,32 @@ namespace midiInOut {
     }
 
     /**
-     * set midi pins
-     * @param note note number
+     * set midi out pin
      */
-    //% block="MIDI out pin = $midiOut MIDI in pin = $midiIn"
-    export function setMidiPins(midiOut: SerialPin, midiIn: SerialPin) {
+    //% block="Set MIDI out pin to = $midiOut"
+    export function setMidiOutPin(midiOut: SerialPin) {
+        MIDIOUTPIN = midiOut
         serial.redirect(
-            midiOut,
-            midiIn,
+            MIDIOUTPIN,
+            MIDIINPIN,
+            BaudRate.BaudRate31250
+        )
+    }
+
+    /**
+     * set midi in pin
+     */
+    //% block="Set MIDI in pin to = $midiIn"
+    export function setMidiInPin(midiIn: SerialPin) {
+        MIDIINPIN = midiIn
+        serial.redirect(
+            MIDIOUTPIN,
+            MIDIINPIN,
             BaudRate.BaudRate31250
         )
     }
 }
+
 
 
 function bytesToArray(bits: number) {
