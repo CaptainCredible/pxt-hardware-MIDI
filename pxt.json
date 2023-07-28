@@ -9,7 +9,7 @@
     },
     "files": [
         "README.md",
-        "midiOut.ts"
+        "midiInOut.ts"
     ],
     "testFiles": [
         "test.ts"
