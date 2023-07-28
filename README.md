@@ -27,8 +27,6 @@ midiInOut.onReceiveNoteOn(function (channel, noteNumber, velocity) {
 
 MIT
 
-> Open this page at [https://captaincredible.github.io/pxt-hardware-midi/](https://captaincredible.github.io/pxt-hardware-midi/)
-
 ## Use as Extension
 
 This repository can be added as an **extension** in MakeCode.
@@ -52,6 +50,8 @@ This image shows the blocks code from the last commit in master.
 This image may take a few minutes to refresh.
 
 ![A rendered view of the blocks](https://github.com/captaincredible/pxt-hardware-midi/raw/master/.github/makecode/blocks.png)
+
+> Open this page at [https://captaincredible.github.io/pxt-hardware-midi/](https://captaincredible.github.io/pxt-hardware-midi/)
 
 #### Metadata (used for search, rendering)
 
