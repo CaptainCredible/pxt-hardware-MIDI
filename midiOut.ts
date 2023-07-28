@@ -18,6 +18,7 @@ enum midiMessageEventBus {
     pitchBend = 124
 }
 
+
 function split32To8Array(input: number): number[] {
     const result: number[] = []
     // Extract 8-bit chunks using bit masking and shifting
