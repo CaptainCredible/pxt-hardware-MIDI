@@ -75,10 +75,25 @@ namespace midiInOut {
     }
 
 
-
-
     /**
      * send a midi note
+     * @param note note number
+     */
+    //% block="send noteOn $note with velocity $velocity and duration $duration ms on channel $channel"
+    //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
+    //% channel.defl=1 velocity.defl=127 duration.defl=100 note.defl=60
+    //% weight=451 inlineInputMode=inline
+    export function sendNote(note: number, velocity: number, duration: number, channel: number) {
+        let midiMessage = pins.createBuffer(3);
+        sendNoteOn(note, velocity, channel)
+        control.inBackground(function() {
+            basic.pause(duration)
+            sendNoteOff(note, velocity, channel)
+        })
+    }
+
+    /**
+     * send a midi noteOn 
      * @param note note number
      */
     //% block="send noteOn $note with velocity $velocity on channel $channel"
@@ -102,9 +117,9 @@ namespace midiInOut {
     //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
     //% channel.defl=1 velocity.defl=127 note.defl=60
     //% weight=400
-    export function noteOff(note: number, velocity: number, channel: number) {
+    export function sendNoteOff(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
-        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel);
+        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel-1);
         midiMessage.setNumber(NumberFormat.UInt8LE, 1, note);
         midiMessage.setNumber(NumberFormat.UInt8LE, 2, velocity);
         serial.writeBuffer(midiMessage);
