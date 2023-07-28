@@ -1,8 +1,17 @@
-## midi in/out
+## MIDI in/out
 This extension lets you send and receive the following standard midi messages:
 - note on 
 - note off
 - control change 
+
+## Wiring output
+Connect to a 5pin midi connector like this:
+![wiring output](https://github.com/CaptainCredible/pxt-hardware-MIDI/blob/master/midioutubit.png?raw=true)
+
+## Wiring input
+
+the same wiring works for input in most situations, but if you want to follow the MIDI spec the input should have galvanic isolation by using an optocuopler like this: 
+![wiring output](https://github.com/CaptainCredible/pxt-hardware-MIDI/blob/master/midiInUbit.png?raw=true)
 
 ## Basic usage
 ```blocks
