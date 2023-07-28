@@ -1,9 +1,5 @@
-
-
 const NOTE_ON = 0x90
 const NOTE_OFF = 0x80
-
-
 
 enum midiMessageEventBus {
     //% block="noteOff"
