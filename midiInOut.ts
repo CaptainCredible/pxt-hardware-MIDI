@@ -73,7 +73,6 @@ namespace midiInOut {
 
     /**
      * send a midi note
-     * @param note note number
      */
     //% block="send noteOn $note with velocity $velocity and duration $duration ms on channel $channel"
     //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
@@ -89,8 +88,22 @@ namespace midiInOut {
     }
 
     /**
+         * send a midi control change 
+         */
+    //% block="send controlChange $control with value $value on channel $channel"
+    //% channel.min=1 channel.max=16 value.min=0 value.max=127 control.min=0 note.max=127
+    //% channel.defl=1 value.defl=0 control.defl=10
+    //% weight=450
+    export function sendControlChange(control: number, value: number, channel: number) {
+        let midiMessage = pins.createBuffer(3);
+        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_ON | channel - 1);
+        midiMessage.setNumber(NumberFormat.UInt8LE, 1, control);
+        midiMessage.setNumber(NumberFormat.UInt8LE, 2, value);
+        serial.writeBuffer(midiMessage);
+    }
+
+    /**
      * send a midi noteOn 
-     * @param note note number
      */
     //% block="send noteOn $note with velocity $velocity on channel $channel"
     //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
@@ -107,7 +120,6 @@ namespace midiInOut {
 
     /**
      * send a midi noteOff
-     * @param note note number
      */
     //% block="send noteOff $note with velocity $velocity on channel $channel"
     //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
