@@ -12,4 +12,3 @@ basic.forever(function() {
     midiInOut.sendNote(noteToSend, velocityToSend, noteDuration, midiChannelToUse)
     basic.showIcon(IconNames.SmallHeart)
 })
-

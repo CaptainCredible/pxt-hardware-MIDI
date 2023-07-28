@@ -1,3 +1,10 @@
+## midi in/out
+This extension lets you send and receive the following standard midi messages:
+- note on 
+- note off
+- control change 
+
+Set the midi in and midi out pins using the 
 
 > Open this page at [https://captaincredible.github.io/pxt-hardware-midi/](https://captaincredible.github.io/pxt-hardware-midi/)
 
