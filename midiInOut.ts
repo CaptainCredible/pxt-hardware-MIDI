@@ -42,7 +42,6 @@ namespace midiInOut {
     let MIDIOUTPIN = SerialPin.P1
     let MIDIINPIN = SerialPin.P0    
 
-
     /**
      * set midi in pin
      */
@@ -96,7 +95,7 @@ namespace midiInOut {
     //% block="send noteOn $note with velocity $velocity on channel $channel"
     //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
     //% channel.defl=1 velocity.defl=127 note.defl=60
-    //% weight=450
+    //% weight=450 advanced=true
     export function sendNoteOn(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
         midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_ON | channel-1);
@@ -113,7 +112,7 @@ namespace midiInOut {
     //% block="send noteOff $note with velocity $velocity on channel $channel"
     //% channel.min=1 channel.max=16 velocity.min=0 velocity.max=127 note.min=0 note.max=127
     //% channel.defl=1 velocity.defl=127 note.defl=60
-    //% weight=400
+    //% weight=400 advanced=true
     export function sendNoteOff(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
         midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel-1);

@@ -4,7 +4,28 @@ This extension lets you send and receive the following standard midi messages:
 - note off
 - control change 
 
-Set the midi in and midi out pins using the 
+## Basic usage
+```blocks
+
+//Set the midi in and midi out pins
+midiInOut.setMidiInPin(SerialPin.P0)
+midiInOut.setMidiOutPin(SerialPin.P1)
+
+//Send notes (note number, velocity, duration, midi channel)
+midiInOut.sendNote(45,127,100,1)
+
+// Act on incoming MIDI messages
+midiInOut.onReceiveNoteOn(function (channel, noteNumber, velocity) {
+    basic.showNumber(noteNumber)
+})
+```
+## Supported targets
+
+* for PXT/microbit
+
+## License
+
+MIT
 
 > Open this page at [https://captaincredible.github.io/pxt-hardware-midi/](https://captaincredible.github.io/pxt-hardware-midi/)
 
