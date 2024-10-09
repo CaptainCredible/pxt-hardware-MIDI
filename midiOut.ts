@@ -1,7 +1,10 @@
-
+//midi channel 0 is actually 1
 
 const NOTE_ON = 0x90
 const NOTE_OFF = 0x80
+
+let globalMidiIn = SerialPin.P1
+let globalMidiOut = SerialPin.P2
 
 /**
  * Custom blocks
@@ -26,7 +29,7 @@ namespace midiInOut {
      * @param note note number
      */
     //% block="send noteOff $note with velocity $velocity on channel $channel"
-    export function noteOff(note: number, velocity: number, channel: number) {
+    export function sendNoteOff(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
         midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel);
         midiMessage.setNumber(NumberFormat.UInt8LE, 1, note);
@@ -44,9 +47,28 @@ namespace midiInOut {
             midiOut,
             midiIn,
             BaudRate.BaudRate31250
+        ) 
+        globalMidiIn = midiIn
+        globalMidiOut = midiOut
+    }
+
+    /**
+     * send serial
+     *
+     */
+    //% block="send USB serial: name = $what value = $value"
+    export function sendSerial(what: string, value: number) {
+        serial.redirectToUSB()
+        serial.writeValue(what, value)
+        serial.redirect(
+            globalMidiOut,
+            globalMidiIn,
+            BaudRate.BaudRate31250
         )
     }
+
 }
+
 
 
 function bytesToArray(bits: number) {
