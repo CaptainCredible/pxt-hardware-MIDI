@@ -19,6 +19,8 @@ enum midiMessageEventBus {
 }
 
 
+
+
 function split32To8Array(input: number): number[] {
     const result: number[] = []
     // Extract 8-bit chunks using bit masking and shifting
@@ -40,7 +42,23 @@ function packTo32bit(msb: number, b: number, lsb: number): number {
 //% weight=500 color=#0fbc11 icon=""
 namespace midiInOut {
     let MIDIOUTPIN = SerialPin.P1
-    let MIDIINPIN = SerialPin.P0    
+    let MIDIINPIN = SerialPin.P0
+
+    /**
+ * send serial
+ *
+ */
+    //% block="send USB serial: name = $what value = $value"
+    export function sendSerial(what: string, value: number) {
+        serial.redirectToUSB()
+        serial.writeValue(what, value)
+        serial.redirect(
+            MIDIOUTPIN,
+            MIDIINPIN,
+            BaudRate.BaudRate31250
+        )
+    }
+
 
     /**
      * set midi in pin
@@ -81,7 +99,7 @@ namespace midiInOut {
     export function sendNote(note: number, velocity: number, duration: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
         sendNoteOn(note, velocity, channel)
-        control.inBackground(function() {
+        control.inBackground(function () {
             basic.pause(duration)
             sendNoteOff(note, velocity, channel)
         })
@@ -111,7 +129,7 @@ namespace midiInOut {
     //% weight=450 advanced=true
     export function sendNoteOn(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
-        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_ON | channel-1);
+        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_ON | channel - 1);
         midiMessage.setNumber(NumberFormat.UInt8LE, 1, note);
         midiMessage.setNumber(NumberFormat.UInt8LE, 2, velocity);
         serial.writeBuffer(midiMessage);
@@ -127,7 +145,7 @@ namespace midiInOut {
     //% weight=400 advanced=true
     export function sendNoteOff(note: number, velocity: number, channel: number) {
         let midiMessage = pins.createBuffer(3);
-        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel-1);
+        midiMessage.setNumber(NumberFormat.UInt8LE, 0, NOTE_OFF | channel - 1);
         midiMessage.setNumber(NumberFormat.UInt8LE, 1, note);
         midiMessage.setNumber(NumberFormat.UInt8LE, 2, velocity);
         serial.writeBuffer(midiMessage);
@@ -140,7 +158,7 @@ namespace midiInOut {
     //%draggableParameters=reporter
     //%weight=350
     export function onReceiveNoteOn(cb: (channel: number, noteNumber: number, velocity: number) => void) {
-        if(!midiListenerExists){
+        if (!midiListenerExists) {
             setupMidiListener();
         }
         onReceiveNoteOnHandler = cb;
@@ -175,6 +193,86 @@ namespace midiInOut {
 
     let midiInData = pins.createBuffer(3)
     let midiListenerExists = false;
+
+
+    function setupMidiListener() {
+        if (!midiListenerExists) {
+            midiListenerExists = true;
+
+            let statusByte: number = 0;
+            let dataBytesRead: number = 0;
+            let data1: number = 0;
+            let data2: number = 0;
+
+            // Use a 1ms interval loop to initiate the MIDI parser
+            loops.everyInterval(1, function () {
+                // Lock the parser in a while loop to process all incoming bytes
+                while (true) {
+                    // Read one byte from the serial buffer
+                    let midiBuffer = serial.readBuffer(1);
+
+                    // If buffer is empty, break out of the while loop
+                    if (midiBuffer.length == 0) {
+                        break;
+                    }
+
+                    let midiByte = midiBuffer[0];
+
+                    // If it's a clock message (0xF8), ignore and break out of the loop
+                    if (midiByte == 248) { // 248 is the decimal value for 0xF8 (Timing Clock)
+                        break;
+                    }
+
+                    // If the byte is a status byte (>= 128), handle it
+                    if (midiByte >= 128) {
+                        statusByte = midiByte;
+                        dataBytesRead = 0; // Reset data byte count
+                    } else {
+                        // Handle data bytes based on the current status byte
+                        if (dataBytesRead == 0) {
+                            data1 = midiByte;
+                            dataBytesRead = 1;
+                        } else if (dataBytesRead == 1) {
+                            data2 = midiByte;
+                            dataBytesRead = 2;
+
+                            // Now we have both data bytes, process the message
+                            const messageType = (statusByte & 0xF0) >> 4;
+                            const channelNumber = statusByte & 0x0F;
+
+                            switch (messageType) {
+                                case 8:
+                                    // Note Off
+                                    if (onReceiveNoteOffHandler) {
+                                        onReceiveNoteOffHandler(channelNumber, data1, data2);
+                                    }
+                                    break;
+                                case 9:
+                                    // Note On
+                                    if (onReceiveNoteOnHandler) {
+                                        onReceiveNoteOnHandler(channelNumber, data1, data2);
+                                    }
+                                    break;
+                                case 11:
+                                    // Control Change
+                                    if (onReceiveCCHandler) {
+                                        onReceiveCCHandler(channelNumber, data1, data2);
+                                    }
+                                    break;
+                                default:
+                                // Unhandled message type
+                            }
+
+                            // Reset data bytes count after handling the message
+                            dataBytesRead = 0;
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /* //OLD LISTENER 3BYTES AT A TIME, BREAKS 
     function setupMidiListener() {
         if (!midiListenerExists) {
             midiListenerExists = true
@@ -224,4 +322,5 @@ namespace midiInOut {
             })
         }
     }
- } // end of namespace
+    */
+} // end of namespace
